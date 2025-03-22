@@ -1,43 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const browserAPI = typeof browser !== "undefined" ? browser : chrome;
 
 function Popup() {
-  const [tabInfo, setTabInfo] = useState(null);
+  const [bookmarks, setBookmarks] = useState([]);
 
-  const getTabInfo = () => {
-    if (!browserAPI?.runtime) {
-      console.error("Browser API not available");
-      return;
-    }
-
-    browserAPI.runtime.sendMessage({ action: "getTabInfo" }, (response) => {
-      if (browserAPI.runtime.lastError) {
-        console.error("Error:", browserAPI.runtime.lastError);
-      } else if (response) {
-        if (response.error) {
-          console.error("Error from background:", response.error);
-        } else {
-          setTabInfo(response);
+  useEffect(() => {
+    browserAPI.runtime.sendMessage(
+      { action: "requestBookmarks" },
+      (response) => {
+        if (response && response.bookmarks) {
+          setBookmarks(response.bookmarks);
         }
+      },
+    );
+
+    const listener = (message) => {
+      if (message.action === "bookmarksUpdated" && message.bookmarks) {
+        setBookmarks(message.bookmarks);
       }
-    });
-  };
+    };
+
+    browserAPI.runtime.onMessage.addListener(listener);
+
+    return () => {
+      browserAPI.runtime.onMessage.removeListener(listener);
+    };
+  }, []);
 
   return (
-    <div style={{ padding: "10px", width: "200px" }}>
-      <h2>React Extension</h2>
-      <button onClick={getTabInfo}>Get Tab Info</button>
-      {tabInfo && (
-        <div>
-          <p>
-            <strong>Title:</strong> {tabInfo.title}
-          </p>
-          <p>
-            <strong>URL:</strong> {tabInfo.url}
-          </p>
-        </div>
-      )}
+    <div>
+      <h2>Bookmarks</h2>
+      <ul>
+        {bookmarks.map((bookmark) => (
+          <li key={bookmark.id}>
+            <a href={bookmark.url} target="_blank" rel="noopener noreferrer">
+              {bookmark.title}
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

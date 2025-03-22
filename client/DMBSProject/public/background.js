@@ -1,37 +1,48 @@
 const browserAPI = typeof browser !== "undefined" ? browser : chrome;
+let previousBookmarks = [];
 
-browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "getTabInfo") {
-    browserAPI.tabs
-      .query({ active: true, currentWindow: true })
-      .then((tabs) => {
-        if (tabs.length > 0) {
-          try {
-            sendResponse({ title: tabs[0].title, url: tabs[0].url });
-          } catch (e) {
-            console.error("sendResponse error", e);
-          }
-        } else {
-          try {
-            sendResponse({ error: "No active tab found" });
-          } catch (e) {
-            console.error("sendResponse error", e);
-          }
-        }
-      })
-      .catch((error) => {
-        try {
-          sendResponse({ error: error.message });
-        } catch (e) {
-          console.error("sendResponse error", e);
-        }
-      });
-    return true;
+async function fetchBookmarks() {
+  try {
+    const bookmarks = await browserAPI.bookmarks.getTree();
+    return flattenBookmarks(bookmarks);
+  } catch (error) {
+    console.error("Error fetching bookmarks:", error);
+    return [];
   }
+}
+
+function flattenBookmarks(bookmarkTreeNodes) {
+  let bookmarks = [];
+  bookmarkTreeNodes.forEach((node) => {
+    if (node.url) {
+      bookmarks.push({ id: node.id, title: node.title, url: node.url });
+    }
+    if (node.children) {
+      bookmarks = bookmarks.concat(flattenBookmarks(node.children));
+    }
+  });
+  return bookmarks;
+}
+
+async function checkBookmarks() {
+  const currentBookmarks = await fetchBookmarks();
+  if (JSON.stringify(currentBookmarks) !== JSON.stringify(previousBookmarks)) {
+    console.log("Bookmarks changed!");
+    previousBookmarks = currentBookmarks;
+    browserAPI.runtime.sendMessage({
+      action: "bookmarksUpdated",
+      bookmarks: currentBookmarks,
+    });
+  }
+}
+
+fetchBookmarks().then((bookmarks) => {
+  previousBookmarks = bookmarks;
+  setInterval(checkBookmarks, 5000); // Check every 5 seconds
 });
 
-if (browserAPI.action) {
-  browserAPI.action.onClicked.addListener((tab) => {
-    console.log("Browser action clicked on tab:", tab);
-  });
-}
+browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "requestBookmarks") {
+    sendResponse({ bookmarks: previousBookmarks });
+  }
+});

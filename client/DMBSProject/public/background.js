@@ -1,5 +1,6 @@
 const browserAPI = typeof browser !== "undefined" ? browser : chrome;
 let previousBookmarks = [];
+let previousBookmarkCount = 0;
 
 async function fetchBookmarks() {
   try {
@@ -26,23 +27,40 @@ function flattenBookmarks(bookmarkTreeNodes) {
 
 async function checkBookmarks() {
   const currentBookmarks = await fetchBookmarks();
-  if (JSON.stringify(currentBookmarks) !== JSON.stringify(previousBookmarks)) {
-    console.log("Bookmarks changed!");
+  const currentBookmarkCount = currentBookmarks.length;
+
+  if (currentBookmarkCount !== previousBookmarkCount) {
+    console.log("Bookmark count changed!");
+    const newBookmarks = currentBookmarks.filter(
+      (bookmark) => !previousBookmarks.some((prev) => prev.id === bookmark.id),
+    );
+
     previousBookmarks = currentBookmarks;
+    previousBookmarkCount = currentBookmarkCount;
+
     browserAPI.runtime.sendMessage({
       action: "bookmarksUpdated",
-      bookmarks: currentBookmarks,
+      count: currentBookmarkCount,
+      newBookmarks: newBookmarks,
     });
   }
 }
 
 fetchBookmarks().then((bookmarks) => {
   previousBookmarks = bookmarks;
-  setInterval(checkBookmarks, 5000); // Check every 5 seconds
+  previousBookmarkCount = bookmarks.length;
+  setInterval(checkBookmarks, 5000);
 });
 
 browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "requestBookmarks") {
-    sendResponse({ bookmarks: previousBookmarks });
+  if (message.action === "requestBookmarkCount") {
+    sendResponse({ count: previousBookmarkCount });
+  } else if (message.action === "bookmarksUpdated") {
+    try {
+      checkBookmarks();
+    } catch (e) {
+      console.error("error in checkBookmarks", e);
+    }
   }
+  return true;
 });

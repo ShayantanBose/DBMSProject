@@ -4,14 +4,18 @@ const browserAPI = typeof browser !== "undefined" ? browser : chrome;
 
 function Popup() {
   const [bookmarkCount, setBookmarkCount] = useState(0);
-  const [newBookmarks, setNewBookmarks] = useState([]);
+  const [sessionBookmarks, setSessionBookmarks] = useState([]);
 
   useEffect(() => {
     browserAPI.runtime.sendMessage(
-      { action: "requestBookmarkCount" },
+      { action: "requestBookmarks" },
       (response) => {
+        console.log("popup received response", response);
         if (response && response.count) {
           setBookmarkCount(response.count);
+        }
+        if (response && response.sessionAdded) {
+          setSessionBookmarks(response.sessionAdded);
         }
       },
     );
@@ -19,7 +23,8 @@ function Popup() {
     const listener = (message) => {
       if (message.action === "bookmarksUpdated") {
         setBookmarkCount(message.count);
-        setNewBookmarks(message.newBookmarks);
+        setSessionBookmarks(message.sessionAdded);
+        console.log("popup received new bookmarks", message.sessionAdded);
       }
     };
 
@@ -34,11 +39,11 @@ function Popup() {
     <div>
       <h2>Bookmarks</h2>
       <p>Total Bookmarks: {bookmarkCount}</p>
-      {newBookmarks.length > 0 && (
+      {sessionBookmarks.length > 0 && (
         <div>
-          <h3>New Bookmarks:</h3>
+          <h3>Session Added Bookmarks:</h3>
           <ul>
-            {newBookmarks.map((bookmark) => (
+            {sessionBookmarks.map((bookmark) => (
               <li key={bookmark.id}>
                 <a
                   href={bookmark.url}

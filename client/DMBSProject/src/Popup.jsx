@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import UserIcon from "./assets/User.png";
+import "./styles/Popup.css";
 
 const browserAPI = typeof browser !== "undefined" ? browser : chrome;
 
@@ -36,14 +38,24 @@ function Popup() {
   }, []);
 
   return (
-    <div>
-      <h2>Bookmarks</h2>
-      <p>Total Bookmarks: {bookmarkCount}</p>
-      {sessionBookmarks.length > 0 && (
-        <div>
-          <h3>Session Added Bookmarks:</h3>
-          <ul>
-            {sessionBookmarks.map((bookmark) => (
+    <div className="popup-container">
+      <div className="header">
+        <h2>BROWSESYNC</h2>
+        <div className="user-icon">
+          <img src={UserIcon} alt="User Icon" />
+        </div>
+      </div>
+
+      <div className="box">
+        <p className="title">TOTAL BOOKMARKS</p>
+        <p className="count">{bookmarkCount}</p>
+      </div>
+
+      <div className="box">
+        <p className="title">NEWLY ADDED</p>
+        <ul>
+          {sessionBookmarks.length > 0 ? (
+            sessionBookmarks.map((bookmark) => (
               <li key={bookmark.id}>
                 <a
                   href={bookmark.url}
@@ -53,10 +65,15 @@ function Popup() {
                   {bookmark.title}
                 </a>
               </li>
-            ))}
-          </ul>
-        </div>
-      )}
+            ))
+          ) : (
+            <li>No new bookmarks</li>
+          )}
+        </ul>
+      </div>
+
+      <button className="sync-button">SYNC TO ALL BROWSERS</button>
+      <button className="sync-button outline">SYNC TO ALL DEVICES</button>
     </div>
   );
 }

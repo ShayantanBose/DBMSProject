@@ -1,0 +1,64 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Oswald:wght@200..700&display=swap");
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 300px;
+  height: 404px;
+  background: black;
+}
+
+.popup-container {
+  width: 280px;
+  height: 91px;
+  background: black;
+  color: white;
+  padding: 10px;
+  font-family: "Inter", sans-serif;
+  font-weight: normal;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.box {
+  border: 2px solid white;
+  padding: 10px;
+  flex-grow: 1;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.count {
+  font-size: 20px;
+  margin-top: 5px;
+}
+
+.sync-button {
+  width: 100%;
+  padding: 10px;
+  background: white;
+  color: black;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.sync-button.outline {
+  background: black;
+  color: white;
+  border: 2px solid white;
+}

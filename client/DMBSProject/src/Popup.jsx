@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import UserIcon from "./assets/User.png";
 import "./styles/Popup.css";
 

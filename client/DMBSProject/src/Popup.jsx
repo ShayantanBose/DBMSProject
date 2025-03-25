@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import UserIcon from "./assets/User.png";
+import Header from "./component/Header.jsx";
 import "./styles/Popup.css";
 
 const browserAPI = typeof browser !== "undefined" ? browser : chrome;
@@ -39,12 +39,7 @@ function Popup() {
 
   return (
     <div className="popup-container">
-      <div className="header">
-        <h2>BROWSESYNC</h2>
-        <div className="user-icon">
-          <img src={UserIcon} alt="User Icon" draggable="false" />
-        </div>
-      </div>
+      <Header />
 
       <div className="box">
         <p className="title">TOTAL BOOKMARKS</p>

@@ -42,7 +42,7 @@ function Popup() {
       <div className="header">
         <h2>BROWSESYNC</h2>
         <div className="user-icon">
-          <img src={UserIcon} alt="User Icon" />
+          <img src={UserIcon} alt="User Icon" draggable="false" />
         </div>
       </div>
 
@@ -56,7 +56,7 @@ function Popup() {
         <ul>
           {sessionBookmarks.length > 0 ? (
             sessionBookmarks.map((bookmark) => (
-              <li key={bookmark.id}>
+              <li className="bookmarks-added" key={bookmark.id}>
                 <a
                   href={bookmark.url}
                   target="_blank"
@@ -72,8 +72,8 @@ function Popup() {
         </ul>
       </div>
 
-      <button className="sync-button">SYNC TO ALL BROWSERS</button>
-      <button className="sync-button outline">SYNC TO ALL DEVICES</button>
+      <button className="sync-button-browsers">SYNC TO ALL BROWSERS</button>
+      <button className="sync-button-devices">SYNC TO ALL DEVICES</button>
     </div>
   );
 }

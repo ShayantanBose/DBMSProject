@@ -3,15 +3,88 @@
 html,
 body {
   background-color: black;
+  width: 300px;
+  margin: 0px;
 }
 
-.popup-container {
-  max-width: 300px;
-  max-height: 398px;
+#root {
   height: 100%;
   width: 100%;
 }
 
+.popup-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 8px;
+}
+
 .header {
+  margin: 10px;
+  font-family: "Oswald", sans-serif;
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+}
+
+.header h2 {
+  color: white;
+  margin: 0px;
+  padding: 5px 10px;
   font-size: 34px;
+  border: 1px solid white;
+  border-radius: 4px;
+}
+
+.box {
+  margin: 10px;
+  margin-left: 10px;
+  border: 1px solid white;
+  border-radius: 4px;
+  color: white;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+}
+
+.title {
+  margin: 5px;
+  font-size: 24px;
+}
+
+.count {
+  font-size: 24px;
+  margin-top: 15px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
+.bookmarks-added {
+  font-size: 14px;
+  color: white;
+}
+
+.sync-button-browsers {
+  background-color: white;
+  border: none;
+  padding: 10px;
+  margin: 0px 10px 10px 10px;
+  border-radius: 4px;
+  width: 280px;
+  height: 41px;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.sync-button-devices {
+  background-color: black;
+  border: 1px solid white;
+  padding: 10px;
+  margin: 0px 10px 10px 10px;
+  border-radius: 4px;
+  width: 280px;
+  height: 41px;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
 }

@@ -6,7 +6,7 @@ import { useState } from "react";
 import "./styles/Popup.css";
 
 export default function Popup() {
-  const [currentPage, setCurrentPage] = useState("authOption");
+  const [currentPage, setCurrentPage] = useState("MainPopup");
   return (
     <div className="popup-container">
       <Header currentPage={currentPage} setCurrentPage={setCurrentPage} />

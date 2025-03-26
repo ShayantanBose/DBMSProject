@@ -1,15 +1,17 @@
 const browserAPI = typeof browser !== "undefined" ? browser : chrome;
-let previousBookmarks = [];
 let previousBookmarkCount = 0;
 let sessionAddedBookmarks = [];
 
-async function fetchBookmarks() {
+async function getInitialBookmarkCount() {
   try {
     const bookmarks = await browserAPI.bookmarks.getTree();
-    return flattenBookmarks(bookmarks);
+    const count = flattenBookmarks(bookmarks).length;
+    console.log("Background: Initial bookmark count fetched:", count);
+    previousBookmarkCount = count;
+    return count;
   } catch (error) {
-    console.error("Error fetching bookmarks:", error);
-    return [];
+    console.error("Background: Error fetching initial bookmark count:", error);
+    return 0;
   }
 }
 
@@ -31,57 +33,35 @@ function flattenBookmarks(bookmarkTreeNodes) {
   return bookmarks;
 }
 
-async function checkBookmarks() {
-  const currentBookmarks = await fetchBookmarks();
-  const currentBookmarkCount = currentBookmarks.length;
+getInitialBookmarkCount(); // Fetch initial count on load
 
-  if (currentBookmarkCount !== previousBookmarkCount) {
-    console.log("Bookmark count changed!");
+browserAPI.bookmarks.onCreated.addListener(async (id, bookmark) => {
+  previousBookmarkCount++;
+  sessionAddedBookmarks.push(bookmark); // Store the bookmark object directly
+  console.log("Background: Bookmark added:", bookmark);
+  // Optionally, you could send an update here IF you implement logic to check if the popup is open
+});
 
-    const newBookmarks = currentBookmarks.filter(
-      (bookmark) => !previousBookmarks.some((prev) => prev.id === bookmark.id),
-    );
-
-    const removedBookmarks = previousBookmarks.filter(
-      (bookmark) => !currentBookmarks.some((curr) => curr.id === bookmark.id),
-    );
-
-    previousBookmarks = currentBookmarks;
-    previousBookmarkCount = currentBookmarkCount;
-
-    sessionAddedBookmarks = sessionAddedBookmarks.concat(newBookmarks);
-
-    sessionAddedBookmarks = sessionAddedBookmarks.filter(
-      (bookmark) =>
-        !removedBookmarks.some((removed) => removed.id === bookmark.id),
-    );
-
-    browserAPI.runtime.sendMessage({
-      action: "bookmarksUpdated",
-      count: currentBookmarkCount,
-      sessionAdded: sessionAddedBookmarks,
-    });
-  }
-}
-
-fetchBookmarks().then((bookmarks) => {
-  previousBookmarks = bookmarks;
-  previousBookmarkCount = bookmarks.length;
-  setInterval(checkBookmarks, 5000); // Check every 5 seconds
+browserAPI.bookmarks.onRemoved.addListener(async (id, removeInfo) => {
+  previousBookmarkCount--;
+  sessionAddedBookmarks = sessionAddedBookmarks.filter(
+    (b) => b.id !== id.toString(),
+  );
 });
 
 browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "requestBookmarks") {
+    console.log("Background: Received requestBookmarks. Sending data.");
     sendResponse({
       count: previousBookmarkCount,
       sessionAdded: sessionAddedBookmarks,
     });
-  } else if (message.action === "bookmarksUpdated") {
-    try {
-      checkBookmarks();
-    } catch (e) {
-      console.error("error in checkBookmarks", e);
-    }
+  } else if (message.action === "clearSessionBookmarks") {
+    sessionAddedBookmarks = [];
+    sendResponse({
+      count: previousBookmarkCount,
+      sessionAdded: sessionAddedBookmarks,
+    });
   }
   return true;
 });

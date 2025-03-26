@@ -4,37 +4,44 @@ import React, { useState, useEffect } from "react";
 const browserAPI = typeof browser !== "undefined" ? browser : chrome;
 
 export default function InitialPopup() {
-  const [bookmarkCount, setBookmarkCount] = useState(0);
+  const [bookmarkCount, setBookmarkCount] = useState("None");
   const [sessionBookmarks, setSessionBookmarks] = useState([]);
 
   useEffect(() => {
+    const handleBookmarksUpdated = (message) => {
+      if (message.action === "bookmarksUpdated") {
+        setBookmarkCount(message.count);
+        setSessionBookmarks(message.sessionAdded);
+      }
+    };
+
+    browserAPI.runtime.onMessage.addListener(handleBookmarksUpdated);
+
     browserAPI.runtime.sendMessage(
       { action: "requestBookmarks" },
       (response) => {
-        console.log("popup received response", response);
-        if (response && response.count) {
+        if (response) {
           setBookmarkCount(response.count);
-        }
-        if (response && response.sessionAdded) {
           setSessionBookmarks(response.sessionAdded);
+        } else {
+          console.log(
+            "InitialPopup: No response received for requestBookmarks",
+          );
         }
       },
     );
 
-    const listener = (message) => {
-      if (message.action === "bookmarksUpdated") {
-        setBookmarkCount(message.count);
-        setSessionBookmarks(message.sessionAdded);
-        console.log("popup received new bookmarks", message.sessionAdded);
-      }
-    };
-
-    browserAPI.runtime.onMessage.addListener(listener);
-
     return () => {
-      browserAPI.runtime.onMessage.removeListener(listener);
+      browserAPI.runtime.onMessage.removeListener(handleBookmarksUpdated);
     };
   }, []);
+
+  console.log(
+    "InitialPopup Rendering - bookmarkCount:",
+    bookmarkCount,
+    "sessionBookmarks:",
+    sessionBookmarks,
+  );
 
   return (
     <>
@@ -46,9 +53,10 @@ export default function InitialPopup() {
       <div className="box">
         <p className="title">NEWLY ADDED</p>
         <ul>
-          {sessionBookmarks.length > 0 ? (
+          {sessionBookmarks && sessionBookmarks.length > 0 ? (
             sessionBookmarks.map((bookmark) => (
               <li className="bookmarks-added" key={bookmark.id}>
+                {console.log("InitialPopup Rendering - Bookmark:", bookmark)}
                 <a
                   href={bookmark.url}
                   target="_blank"

@@ -1,0 +1,31 @@
+.auth-box {
+  margin: 0px 10px 10px 10px;
+  height: 308px;
+  border: 1px solid white;
+  border-radius: 4px;
+  color: white;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-button {
+  background-color: white;
+  border: none;
+  padding: 10px;
+  margin: 0px 10px 10px 10px;
+  border-radius: 4px;
+  width: 215px;
+  height: 50px;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.auth-button:hover {
+  background-color: #cfcfcf;
+  cursor: pointer;
+}

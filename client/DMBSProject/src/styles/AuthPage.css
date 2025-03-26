@@ -1,0 +1,59 @@
+/* AuthPage.css */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Oswald:wght@200..700&display=swap");
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.auth-box {
+  border: 1px solid white;
+  border-radius: 4px;
+  color: white;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  width: 280px;
+}
+
+.enter-secret-heading {
+  font-family: "Oswald", sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 4px;
+  align-self: flex-start;
+}
+
+.secret-input {
+  width: 100%;
+  height: 44px;
+  color: #d9d9d9;
+  border-radius: 5px;
+  margin-top: 0;
+  margin-bottom: 9px;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.submit-secret-button {
+  width: 60px;
+  height: 30px;
+  background-color: black;
+  color: white;
+  border: 1px solid white;
+  border-radius: 5px;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  align-self: flex-end;
+}
+
+.submit-secret-button:hover {
+  cursor: pointer;
+  border: 2px solid white;
+}

@@ -6,25 +6,22 @@ import { useState } from "react";
 import "./styles/Popup.css";
 
 export default function Popup() {
-  const [currentPage, setCurrentPage] = useState("MainPopup");
+  const [currentPage, setCurrentPage] = useState("authOption");
+  const [authContext, setAuthContext] = useState({});
+
+  const navigate = (page, context = {}) => {
+    setCurrentPage(page);
+    setAuthContext(context);
+  };
+
   return (
     <div className="popup-container">
-      <Header currentPage={currentPage} setCurrentPage={setCurrentPage} />
-      {currentPage === "MainPopup" && (
-        <InitialPopup
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-        />
-      )}
+      <Header currentPage={currentPage} setCurrentPage={navigate} />
+      {currentPage === "MainPopup" && <InitialPopup />}
       {currentPage === "authOption" && (
-        <AuthOptionPage
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-        />
+        <AuthOptionPage setCurrentPage={navigate} />
       )}
-      {currentPage === "auth" && (
-        <AuthPage currentPage={currentPage} setCurrentPage={setCurrentPage} />
-      )}
+      {currentPage === "auth" && <AuthPage authContext={authContext} />}
     </div>
   );
 }

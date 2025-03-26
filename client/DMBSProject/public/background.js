@@ -36,7 +36,6 @@ getInitialBookmarkCount();
 browserAPI.bookmarks.onCreated.addListener(async (id, bookmark) => {
   previousBookmarkCount++;
   sessionAddedBookmarks.push(bookmark);
-  console.log("Background: Bookmark added:", bookmark);
 });
 
 browserAPI.bookmarks.onRemoved.addListener(async (id, removeInfo) => {
@@ -48,7 +47,6 @@ browserAPI.bookmarks.onRemoved.addListener(async (id, removeInfo) => {
 
 browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "requestBookmarks") {
-    console.log("Background: Received requestBookmarks. Sending data.");
     sendResponse({
       count: previousBookmarkCount,
       sessionAdded: sessionAddedBookmarks,

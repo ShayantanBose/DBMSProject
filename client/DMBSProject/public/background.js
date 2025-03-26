@@ -33,13 +33,12 @@ function flattenBookmarks(bookmarkTreeNodes) {
   return bookmarks;
 }
 
-getInitialBookmarkCount(); // Fetch initial count on load
+getInitialBookmarkCount();
 
 browserAPI.bookmarks.onCreated.addListener(async (id, bookmark) => {
   previousBookmarkCount++;
-  sessionAddedBookmarks.push(bookmark); // Store the bookmark object directly
+  sessionAddedBookmarks.push(bookmark);
   console.log("Background: Bookmark added:", bookmark);
-  // Optionally, you could send an update here IF you implement logic to check if the popup is open
 });
 
 browserAPI.bookmarks.onRemoved.addListener(async (id, removeInfo) => {

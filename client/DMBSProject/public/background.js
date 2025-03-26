@@ -6,11 +6,9 @@ async function getInitialBookmarkCount() {
   try {
     const bookmarks = await browserAPI.bookmarks.getTree();
     const count = flattenBookmarks(bookmarks).length;
-    console.log("Background: Initial bookmark count fetched:", count);
     previousBookmarkCount = count;
     return count;
   } catch (error) {
-    console.error("Background: Error fetching initial bookmark count:", error);
     return 0;
   }
 }

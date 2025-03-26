@@ -1,11 +1,13 @@
 import "../styles/Popup.css";
 import React, { useState, useEffect } from "react";
-
+import api from "../utils/axiosInstance.js";
 const browserAPI = typeof browser !== "undefined" ? browser : chrome;
 
 export default function InitialPopup() {
   const [bookmarkCount, setBookmarkCount] = useState("None");
   const [sessionBookmarks, setSessionBookmarks] = useState([]);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState("");
 
   useEffect(() => {
     const handleBookmarksUpdated = (message) => {
@@ -35,6 +37,76 @@ export default function InitialPopup() {
       browserAPI.runtime.onMessage.removeListener(handleBookmarksUpdated);
     };
   }, []);
+
+  const handleSyncBrowsersClick = async () => {
+    console.log("Syncing bookmarks to this browser (from backend)...");
+    setSyncing(true);
+    setSyncMessage("Fetching bookmarks from server...");
+
+    try {
+      // backend endpoint
+      const response = await api.get("/api/bookmarks-to-sync");
+      const backendBookmarks = response.data;
+      setSyncMessage("Comparing bookmarks...");
+
+      browserAPI.bookmarks.getTree(async (browserBookmarksTree) => {
+        const browserBookmarks =
+          flattenBookmarksForComparison(browserBookmarksTree);
+
+        const bookmarksToAdd = backendBookmarks.filter(
+          (backendBookmark) =>
+            !browserBookmarks.some(
+              (browserBookmark) =>
+                browserBookmark.title === backendBookmark.title &&
+                browserBookmark.url === backendBookmark.url,
+            ),
+        );
+
+        setSyncMessage(`Adding ${bookmarksToAdd.length} new bookmarks...`);
+        console.log("Bookmarks to add to browser:", bookmarksToAdd);
+
+        for (const bookmark of bookmarksToAdd) {
+          try {
+            await browserAPI.bookmarks.create({
+              title: bookmark.title,
+              url: bookmark.url,
+            });
+            console.log(`Added bookmark: ${bookmark.title}`);
+          } catch (error) {
+            console.error(`Error adding bookmark ${bookmark.title}:`, error);
+          }
+        }
+
+        setSyncing(false);
+        setSyncMessage(
+          `Successfully added ${bookmarksToAdd.length} new bookmarks to this browser.`,
+        );
+        alert(
+          `Successfully added ${bookmarksToAdd.length} new bookmarks to this browser.`,
+        );
+      });
+    } catch (error) {
+      console.error("Error fetching or syncing bookmarks from backend:", error);
+      setSyncing(false);
+      setSyncMessage("Error syncing bookmarks. Please try again.");
+      alert("Error syncing bookmarks. Please try again.");
+    }
+  };
+
+  const flattenBookmarksForComparison = (bookmarkNodes) => {
+    let bookmarks = [];
+    bookmarkNodes.forEach((node) => {
+      if (node.url) {
+        bookmarks.push({ title: node.title, url: node.url });
+      }
+      if (node.children) {
+        bookmarks = bookmarks.concat(
+          flattenBookmarksForComparison(node.children),
+        );
+      }
+    });
+    return bookmarks;
+  };
 
   console.log(
     "InitialPopup Rendering - bookmarkCount:",
@@ -72,8 +144,17 @@ export default function InitialPopup() {
         </ul>
       </div>
 
-      <button className="sync-button-browsers">SYNC TO ALL BROWSERS</button>
-      <button className="sync-button-devices">SYNC TO ALL DEVICES</button>
+      <button
+        className="sync-button-browsers"
+        onClick={handleSyncBrowsersClick}
+        disabled={syncing}
+      >
+        {syncing ? "Syncing..." : "SYNC TO ALL BROWSERS"}
+      </button>
+      <button className="sync-button-devices" disabled={syncing}>
+        SYNC TO ALL DEVICES
+      </button>
+      {syncMessage && <p className="sync-message">{syncMessage}</p>}
     </>
   );
 }

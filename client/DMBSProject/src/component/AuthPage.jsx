@@ -21,10 +21,12 @@ export default function AuthPage({ authContext, setCurrentPage }) {
       if (authContext.userType === "new") {
         const response = await api.post("/api/new-user", { secretKey });
         console.log("New user creation response:", response.data);
+        // Handle successful new user creation (e.g., navigate to main popup)
         setCurrentPage("MainPopup");
       } else if (authContext.userType === "existing") {
         const response = await api.post("/api/verify-user", { secretKey });
         console.log("Existing user verification response:", response.data);
+        // Handle successful existing user verification (e.g., navigate to main popup)
         setCurrentPage("MainPopup");
       }
     } catch (error) {

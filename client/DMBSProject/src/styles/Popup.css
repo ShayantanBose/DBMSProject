@@ -33,6 +33,11 @@ body {
   font-size: 34px;
   border: 1px solid white;
   border-radius: 4px;
+  cursor: pointer;
+}
+
+.user-icon {
+  cursor: pointer;
 }
 
 .box {
@@ -75,6 +80,11 @@ body {
   font-weight: bold;
 }
 
+.sync-button-browsers:hover {
+  background-color: #cfcfcf;
+  cursor: pointer;
+}
+
 .sync-button-devices {
   background-color: black;
   border: 1px solid white;
@@ -87,4 +97,9 @@ body {
   font-size: 14px;
   font-weight: bold;
   color: white;
+}
+
+.sync-button-devices:hover {
+  border: 2px solid white;
+  cursor: pointer;
 }

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "BrowseSync",
   "version": "1.0",
-  "description": "A cross-browser extension with React",
+  "description": "BROWSESYNC aims to help users manage their bookmarks and keep them synchronized across their various browsers and devices. It involves a user account or a secret-based authentication method and provides a view of recently added bookmarks",
   "action": {
     "default_popup": "index.html",
     "default_icon": "icon.png"

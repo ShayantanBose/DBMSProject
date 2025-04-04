@@ -39,54 +39,32 @@ export default function InitialPopup() {
   }, []);
 
   const handleSyncBrowsersClick = async () => {
-    console.log("Syncing bookmarks to this browser (from backend)...");
     setSyncing(true);
-    setSyncMessage("Fetching bookmarks from server...");
+    setSyncMessage("Fetching and syncing bookmarks...");
 
     try {
-      // backend endpoint
-      const response = await api.get("/api/bookmarks-to-sync");
-      const backendBookmarks = response.data;
-      setSyncMessage("Comparing bookmarks...");
+      const secretKey = localStorage.getItem("userSecretKey");
+      if (!secretKey) {
+        throw new Error("User not authenticated.");
+      }
 
-      browserAPI.bookmarks.getTree(async (browserBookmarksTree) => {
-        const browserBookmarks =
-          flattenBookmarksForComparison(browserBookmarksTree);
+      const browserBookmarksTree = await browserAPI.bookmarks.getTree();
+      const browserBookmarks =
+        flattenBookmarksForComparison(browserBookmarksTree);
 
-        const bookmarksToAdd = backendBookmarks.filter(
-          (backendBookmark) =>
-            !browserBookmarks.some(
-              (browserBookmark) =>
-                browserBookmark.title === backendBookmark.title &&
-                browserBookmark.url === backendBookmark.url,
-            ),
-        );
+      const bookmarksToSend = {
+        secretKey: secretKey,
+        bookmarks: browserBookmarks,
+      };
 
-        setSyncMessage(`Adding ${bookmarksToAdd.length} new bookmarks...`);
-        console.log("Bookmarks to add to browser:", bookmarksToAdd);
+      //backend api
+      const response = await api.post("/api/sync-bookmarks", bookmarksToSend);
 
-        for (const bookmark of bookmarksToAdd) {
-          try {
-            await browserAPI.bookmarks.create({
-              title: bookmark.title,
-              url: bookmark.url,
-            });
-            console.log(`Added bookmark: ${bookmark.title}`);
-          } catch (error) {
-            console.error(`Error adding bookmark ${bookmark.title}:`, error);
-          }
-        }
-
-        setSyncing(false);
-        setSyncMessage(
-          `Successfully added ${bookmarksToAdd.length} new bookmarks to this browser.`,
-        );
-        alert(
-          `Successfully added ${bookmarksToAdd.length} new bookmarks to this browser.`,
-        );
-      });
+      setSyncing(false);
+      setSyncMessage("Bookmarks successfully synced.");
+      alert("Bookmarks successfully synced.");
     } catch (error) {
-      console.error("Error fetching or syncing bookmarks from backend:", error);
+      console.error("Error syncing bookmarks:", error);
       setSyncing(false);
       setSyncMessage("Error syncing bookmarks. Please try again.");
       alert("Error syncing bookmarks. Please try again.");

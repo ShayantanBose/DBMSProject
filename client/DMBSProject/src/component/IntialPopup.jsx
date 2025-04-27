@@ -6,7 +6,8 @@ const browserAPI = typeof browser !== "undefined" ? browser : chrome;
 export default function InitialPopup() {
   const [bookmarkCount, setBookmarkCount] = useState("None");
   const [sessionBookmarks, setSessionBookmarks] = useState([]);
-  const [syncing, setSyncing] = useState(false);
+  const [syncingBrowsers, setSyncingBrowsers] = useState(false);
+  const [syncingDevices, setSyncingDevices] = useState(false);
   const [syncMessage, setSyncMessage] = useState("");
 
   useEffect(() => {
@@ -39,8 +40,8 @@ export default function InitialPopup() {
   }, []);
 
   const handleSyncBrowsersClick = async () => {
-    setSyncing(true);
-    setSyncMessage("Fetching and syncing bookmarks...");
+    setSyncingBrowsers(true);
+    setSyncMessage("Syncing bookmarks to this browser...");
 
     try {
       const secretKey = localStorage.getItem("userSecretKey");
@@ -55,19 +56,49 @@ export default function InitialPopup() {
       const bookmarksToSend = {
         secretKey: secretKey,
         bookmarks: browserBookmarks,
+        syncType: "browser",
       };
 
-      //backend api
+      console.log("Sending browser bookmarks to backend:", bookmarksToSend);
       const response = await api.post("/api/sync-bookmarks", bookmarksToSend);
 
-      setSyncing(false);
-      setSyncMessage("Bookmarks successfully synced.");
-      alert("Bookmarks successfully synced.");
+      setSyncingBrowsers(false);
+      setSyncMessage("Bookmarks successfully synced to this browser.");
+      alert("Bookmarks successfully synced to this browser.");
     } catch (error) {
-      console.error("Error syncing bookmarks:", error);
-      setSyncing(false);
-      setSyncMessage("Error syncing bookmarks. Please try again.");
-      alert("Error syncing bookmarks. Please try again.");
+      console.error("Error syncing bookmarks to this browser:", error);
+      setSyncingBrowsers(false);
+      setSyncMessage("Error syncing to this browser. Please try again.");
+      alert("Error syncing to this browser. Please try again.");
+    }
+  };
+
+  const handleSyncDevicesClick = async () => {
+    setSyncingDevices(true);
+    setSyncMessage("Syncing full bookmark tree to backend...");
+
+    try {
+      const secretKey = localStorage.getItem("userSecretKey");
+      if (!secretKey) {
+        throw new Error("User not authenticated.");
+      }
+      const browserBookmarksTree = await browserAPI.bookmarks.getTree();
+      const bookmarksToSend = {
+        secretKey: secretKey,
+        fullBookmarksTree: browserBookmarksTree,
+        syncType: "device",
+      };
+      console.log("Sending full bookmark tree to backend:", bookmarksToSend);
+      const response = await api.post("/api/sync-bookmarks", bookmarksToSend);
+
+      setSyncingDevices(false);
+      setSyncMessage("Full bookmark tree successfully synced to backend.");
+      alert("Full bookmark tree successfully synced to backend.");
+    } catch (error) {
+      console.error("Error syncing full bookmark tree:", error);
+      setSyncingDevices(false);
+      setSyncMessage("Error syncing full bookmark tree. Please try again.");
+      alert("Error syncing full bookmark tree. Please try again.");
     }
   };
 
@@ -125,12 +156,16 @@ export default function InitialPopup() {
       <button
         className="sync-button-browsers"
         onClick={handleSyncBrowsersClick}
-        disabled={syncing}
+        disabled={syncingBrowsers}
       >
-        {syncing ? "Syncing..." : "SYNC TO ALL BROWSERS"}
+        {syncingBrowsers ? "Syncing..." : "SYNC TO ALL BROWSERS"}
       </button>
-      <button className="sync-button-devices" disabled={syncing}>
-        SYNC TO ALL DEVICES
+      <button
+        className="sync-button-devices"
+        onClick={handleSyncDevicesClick}
+        disabled={syncingDevices}
+      >
+        {syncingDevices ? "Syncing..." : "SYNC TO ALL DEVICES"}
       </button>
       {syncMessage && <p className="sync-message">{syncMessage}</p>}
     </>

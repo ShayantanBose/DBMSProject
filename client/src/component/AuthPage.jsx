@@ -30,28 +30,16 @@ export default function AuthPage({ setCurrentPage, authContext }) {
 
     try {
       if (isNewUser) {
-        console.log("Creating new user with secret key:", secretKey);
         const response = await api.post("/api/new-user", { secretKey });
-        console.log("New user creation response:", response.data);
         localStorage.setItem("userSecretKey", secretKey);
         setCurrentPage("MainPopup");
       } else {
-        console.log("Verifying existing user with secret key:", secretKey);
         const response = await api.post("/api/verify-user", { secretKey });
-        console.log("Verification response:", response.data);
         localStorage.setItem("userSecretKey", secretKey);
         setCurrentPage("MainPopup");
       }
     } catch (error) {
-      console.error(
-        isNewUser ? "User creation error:" : "Authentication error:",
-        error
-      );
-
       if (error.response) {
-        console.log("Error response status:", error.response.status);
-        console.log("Error response data:", error.response.data);
-
         if (!isNewUser && error.response.status === 404) {
           setNewUserConfirmation(true);
         } else if (error.response.data && error.response.data.message) {
@@ -65,11 +53,9 @@ export default function AuthPage({ setCurrentPage, authContext }) {
         }
       } else if (error.request) {
         // Request was made but no response was received
-        console.error("No response received:", error.request);
         setErrorMessage("No response from server. Please try again.");
       } else {
         // Something happened in setting up the request
-        console.error("Request setup error:", error.message);
         setErrorMessage(
           isNewUser
             ? "An error occurred during account creation."
@@ -81,14 +67,10 @@ export default function AuthPage({ setCurrentPage, authContext }) {
 
   const handleCreateNewUser = async () => {
     try {
-      console.log("Creating new user with secret key:", secretKey);
       const response = await api.post("/api/new-user", { secretKey });
-      console.log("New user creation response:", response.data);
       localStorage.setItem("userSecretKey", secretKey);
       setCurrentPage("MainPopup");
     } catch (error) {
-      console.error("User creation error:", error);
-
       if (
         error.response &&
         error.response.data &&

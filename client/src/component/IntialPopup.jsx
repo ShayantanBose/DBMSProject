@@ -26,12 +26,8 @@ export default function InitialPopup() {
         if (response) {
           setBookmarkCount(response.count);
           setSessionBookmarks(response.sessionAdded);
-        } else {
-          console.log(
-            "InitialPopup: No response received for requestBookmarks",
-          );
         }
-      },
+      }
     );
 
     return () => {
@@ -59,14 +55,12 @@ export default function InitialPopup() {
         syncType: "browser",
       };
 
-      console.log("Sending browser bookmarks to backend:", bookmarksToSend);
       const response = await api.post("/api/sync-bookmarks", bookmarksToSend);
 
       setSyncingBrowsers(false);
       setSyncMessage("Bookmarks successfully synced to this browser.");
       alert("Bookmarks successfully synced to this browser.");
     } catch (error) {
-      console.error("Error syncing bookmarks to this browser:", error);
       setSyncingBrowsers(false);
       setSyncMessage("Error syncing to this browser. Please try again.");
       alert("Error syncing to this browser. Please try again.");
@@ -88,14 +82,12 @@ export default function InitialPopup() {
         fullBookmarksTree: browserBookmarksTree,
         syncType: "device",
       };
-      console.log("Sending full bookmark tree to backend:", bookmarksToSend);
       const response = await api.post("/api/sync-bookmarks", bookmarksToSend);
 
       setSyncingDevices(false);
       setSyncMessage("Full bookmark tree successfully synced to backend.");
       alert("Full bookmark tree successfully synced to backend.");
     } catch (error) {
-      console.error("Error syncing full bookmark tree:", error);
       setSyncingDevices(false);
       setSyncMessage("Error syncing full bookmark tree. Please try again.");
       alert("Error syncing full bookmark tree. Please try again.");
@@ -110,19 +102,12 @@ export default function InitialPopup() {
       }
       if (node.children) {
         bookmarks = bookmarks.concat(
-          flattenBookmarksForComparison(node.children),
+          flattenBookmarksForComparison(node.children)
         );
       }
     });
     return bookmarks;
   };
-
-  console.log(
-    "InitialPopup Rendering - bookmarkCount:",
-    bookmarkCount,
-    "sessionBookmarks:",
-    sessionBookmarks,
-  );
 
   return (
     <>
@@ -137,7 +122,6 @@ export default function InitialPopup() {
           {sessionBookmarks && sessionBookmarks.length > 0 ? (
             sessionBookmarks.map((bookmark) => (
               <li className="bookmarks-added" key={bookmark.id}>
-                {console.log("InitialPopup Rendering - Bookmark:", bookmark)}
                 <a
                   href={bookmark.url}
                   target="_blank"

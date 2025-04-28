@@ -21,7 +21,9 @@ export default function Popup() {
       {currentPage === "authOption" && (
         <AuthOptionPage setCurrentPage={navigate} />
       )}
-      {currentPage === "auth" && <AuthPage authContext={authContext} />}
+      {currentPage === "auth" && (
+        <AuthPage setCurrentPage={navigate} authContext={authContext} />
+      )}
     </div>
   );
 }

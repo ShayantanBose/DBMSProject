@@ -61,3 +61,39 @@
   cursor: pointer;
   border: 2px solid white;
 }
+
+/* New styles for error messages */
+.error-message {
+  color: #ff4d4f;
+  font-size: 14px;
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-weight: normal;
+}
+
+/* Styles for new user confirmation */
+.new-user-confirmation {
+  margin-top: 15px;
+  text-align: center;
+  width: 100%;
+}
+
+.new-user-confirmation p {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.new-user-confirmation button {
+  background-color: white;
+  color: black;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.new-user-confirmation button:hover {
+  background-color: #cfcfcf;
+}

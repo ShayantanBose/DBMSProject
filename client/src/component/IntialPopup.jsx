@@ -35,6 +35,43 @@ export default function InitialPopup() {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchSavedBookmarks = async () => {
+      try {
+        const secretKey = localStorage.getItem("userSecretKey");
+        if (!secretKey) return;
+        const response = await api.get("/api/bookmarks", {
+          params: { secretKey },
+        });
+        const fetchedBookmarks = response.data.bookmarks;
+
+        const parentId = "1";
+        const existingBookmarks = await browserAPI.bookmarks.getChildren(
+          parentId
+        );
+
+        for (const bm of fetchedBookmarks) {
+          if (
+            bm.url &&
+            !existingBookmarks.some((node) => node.url === bm.url)
+          ) {
+            await browserAPI.bookmarks.create({
+              parentId,
+              title: bm.title,
+              url: bm.url,
+            });
+          }
+        }
+
+        setBookmarkCount(fetchedBookmarks.length);
+      } catch (error) {
+        console.error("Error fetching saved bookmarks:", error);
+      }
+    };
+
+    fetchSavedBookmarks();
+  }, []);
+
   const handleSyncBrowsersClick = async () => {
     setSyncingBrowsers(true);
     setSyncMessage("Syncing bookmarks to this browser...");
@@ -136,7 +173,6 @@ export default function InitialPopup() {
           )}
         </ul>
       </div>
-
       <button
         className="sync-button-browsers"
         onClick={handleSyncBrowsersClick}
@@ -151,7 +187,6 @@ export default function InitialPopup() {
       >
         {syncingDevices ? "Syncing..." : "SYNC TO ALL DEVICES"}
       </button>
-      {syncMessage && <p className="sync-message">{syncMessage}</p>}
     </>
   );
 }

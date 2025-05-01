@@ -6,7 +6,6 @@ const mysql = require("mysql2/promise");
 const app = express();
 const PORT = 3001;
 
-// MySQL connection pool (placeholder credentials)
 const pool = mysql.createPool({
   host: "localhost",
   user: "root",
@@ -94,6 +93,31 @@ app.post("/api/sync-bookmarks", async (req, res) => {
     } else {
       res.status(400).json({ message: "Invalid syncType or data." });
     }
+  } catch (err) {
+    res.status(500).json({ message: "Database error.", error: err.message });
+  }
+});
+
+// Endpoint: Get bookmarks for user
+app.get("/api/bookmarks", async (req, res) => {
+  const { secretKey } = req.query;
+  if (!secretKey)
+    return res.status(400).json({ message: "Secret key required." });
+  try {
+    const [userRows] = await pool.query(
+      "SELECT id FROM users WHERE secret_key = ?",
+      [secretKey]
+    );
+    if (userRows.length === 0)
+      return res.status(404).json({ message: "User not found." });
+    const userId = userRows[0].id;
+
+    const [bookmarkRows] = await pool.query(
+      "SELECT id, title, url FROM bookmarks WHERE user_id = ?",
+      [userId]
+    );
+
+    res.status(200).json({ bookmarks: bookmarkRows });
   } catch (err) {
     res.status(500).json({ message: "Database error.", error: err.message });
   }

@@ -6,7 +6,10 @@ import { useState } from "react";
 import "./styles/Popup.css";
 
 export default function Popup() {
-  const [currentPage, setCurrentPage] = useState("authOption");
+  const [currentPage, setCurrentPage] = useState(() => {
+    // Skip auth if userSecretKey is already stored
+    return localStorage.getItem("userSecretKey") ? "MainPopup" : "authOption";
+  });
   const [authContext, setAuthContext] = useState({});
 
   const navigate = (page, context = {}) => {

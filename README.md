@@ -1,6 +1,6 @@
 # BrowseSync: Browser Bookmark Synchronization
 
-BrowseSync is a browser extension that allows you to synchronize your bookmarks across different browsers and devices using a MySQL backend for persistent storage.
+BrowseSync is a browser extension that allows you to synchronize your bookmarks across different browsers and devices using a MySQL database and a backend for persistent storage.
 
 ## Project Overview
 

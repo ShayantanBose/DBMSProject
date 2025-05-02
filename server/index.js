@@ -2,14 +2,15 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const mysql = require("mysql2/promise");
+const dotenv = require("dotenv");
 
 const app = express();
 const PORT = 3001;
 
 const pool = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "sysadmin",
+  host: dotenv.DB_URI,
+  user: dotenv.DB_USERNAME,
+  password: dotenv.DB_PASSWORD,
   database: "bookmarkSync",
   waitForConnections: true,
   connectionLimit: 10,
